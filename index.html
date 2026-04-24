@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario Tecnológico</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="main-shell">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Inventario Tecnológico</h1>
+      <p class="subtitle">Registra y gestiona los equipos con una experiencia moderna y clara.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="logout()">
+        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17l5-5-5-5v3H9v4h7v3zM8 5h2v14H8V5z"/></svg></span>
+        Cerrar sesión
+      </button>
+      <a class="btn btn-ghost" href="usuarios.html">
+        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C13 14.17 8.33 13 6 13zm10 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></span>
+        Administrar usuarios
+      </a>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14.5h-2v-2h2v2zm0-4h-2V7h2v5.5z"/></svg></span>
+      <div>
+        <p class="stat-label">Total equipos</p>
+        <p id="statTotal" class="stat-value">0</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Registrar Equipo</h2>
+
+    <div class="form-grid">
+      <input id="nombre" class="input-field" placeholder="Nombre del equipo">
+      <input id="serial" class="input-field" placeholder="Serial">
+      <input id="placa" class="input-field" placeholder="Placa">
+      <input id="modelo" class="input-field" placeholder="Modelo">
+      <input id="marca" class="input-field" placeholder="ID Marca (ej: 1)">
+      <input id="tipo" class="input-field" placeholder="ID Tipo (ej: 1)">
+      <input id="estado" class="input-field" placeholder="ID Estado (ej: 1)">
+      <input id="piso" class="input-field" placeholder="ID Piso (ej: 1)">
+      <input id="ciudad" class="input-field" placeholder="Ciudad donde se ubica">
+      <input id="edificio" class="input-field" placeholder="Edificio donde se ubica">
+      <input id="usuario" class="input-field" placeholder="ID Usuario (ej: 1)">
+    </div>
+
+    <div class="action-row">
+      <button class="btn btn-primary" onclick="guardarEquipo()">
+        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-6 16.5L6.5 15H9v-4h6v4h2.5L11 19.5zM13 9H7V5h6v4z"/></svg></span>
+        Guardar Equipo
+      </button>
+      <button id="cancelEditBtn" class="btn btn-secondary" onclick="cancelarEdicion()" style="display:none;">
+        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-6.29 6.3-1.42-1.42L10.59 12 4.29 5.71 5.71 4.29 12 10.59l6.29-6.3z"/></svg></span>
+        Cancelar edición
+      </button>
+    </div>
+
+    <p id="modoEdicionTexto" class="status-text" style="display:none;"></p>
+  </div>
+
+  <div class="card">
+    <h2>Lista de equipos</h2>
+    <div class="table-wrap">
+      <table class="table-modern" id="equiposTabla">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Equipo</th>
+            <th>Serial</th>
+            <th>Placa</th>
+            <th>Modelo</th>
+            <th>Marca</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Piso</th>
+            <th>Ciudad</th>
+            <th>Edificio</th>
+            <th>Usuario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="equiposBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+  const esServicio = usuario && usuario.rol === "servicio";
+  let equipoEditandoId = null;
+  const modoEdicionTexto = document.getElementById("modoEdicionTexto");
+  const iconEdit = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM5.92 18.42h-.67v-.67l8.76-8.76.67.67-8.76 8.76zM20.71 7.04a1.003 1.003 0 000-1.42l-2.34-2.34a1.003 1.003 0 00-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>`;
+  const iconTrash = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zm3.46-9.12l1.06 8h1.96l1.06-8h-4.08zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>`;
+  const iconSave = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-6 16.5L6.5 15H9v-4h6v4h2.5L11 19.5zM13 9H7V5h6v4z"/></svg>`;
+  const iconCancel = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-6.29 6.3-1.42-1.42L10.59 12 4.29 5.71 5.71 4.29 12 10.59l6.29-6.3z"/></svg>`;
+
+if (!usuario) {
+  window.location.href = "login.html";
+}
+
+window.addEventListener("load", () => {
+  if (esServicio) {
+    const crearButton = document.querySelector("button[onclick='guardarEquipo()']");
+    if (crearButton) crearButton.style.display = "none";
+    document.querySelectorAll("input[id='nombre'], input[id='serial'], input[id='placa'], input[id='modelo'], input[id='marca'], input[id='tipo'], input[id='estado'], input[id='piso'], input[id='ciudad'], input[id='edificio'], input[id='usuario']").forEach(input => {
+      input.disabled = true;
+    });
+    const notice = document.createElement("p");
+    notice.className = "notice";
+    notice.textContent = "El rol servicio solo puede ver la página; no puede crear equipos.";
+    const title = document.querySelector(".card h2");
+    if (title) title.insertAdjacentElement("afterend", notice);
+  }
+  modoEdicionTexto.style.display = "none";
+  loadEquipos();
+});
+
+function logout() {
+  localStorage.removeItem("usuario");
+  window.location.href = "login.html";
+}
+
+function guardarEquipo() {
+  if (esServicio) {
+    alert("No tienes permisos para crear equipos");
+    return;
+  }
+
+  if (equipoEditandoId) {
+    actualizarEquipo(equipoEditandoId);
+    return;
+  }
+
+  fetch("http://localhost:3000/equipos", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-user-role": usuario.rol
+    },
+    body: JSON.stringify({
+      nombre_equipo: document.getElementById("nombre").value,
+      serial: document.getElementById("serial").value,
+      placa: document.getElementById("placa").value,
+      modelo: document.getElementById("modelo").value,
+      marca_id: document.getElementById("marca").value,
+      tipo_equipo_id: document.getElementById("tipo").value,
+      estado_id: document.getElementById("estado").value,
+      piso_id: document.getElementById("piso").value,
+      ciudad: document.getElementById("ciudad").value,
+      edificio: document.getElementById("edificio").value,
+      usuario_modifica: document.getElementById("usuario").value
+    })
+  })
+  .then(res => res.text())
+  .then(data => {
+    alert(data);
+    clearForm();
+    loadEquipos();
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error al guardar el equipo");
+  });
+}
+
+function loadEquipos() {
+  fetch("http://localhost:3000/equipos")
+    .then(res => res.json())
+    .then(data => {
+      const body = document.getElementById("equiposBody");
+      body.innerHTML = "";
+      if (!Array.isArray(data)) return;
+      updateStats(data);
+      data.forEach(equipo => {
+        const row = document.createElement("tr");
+        row.id = `equipo-row-${equipo.id}`;
+        row.dataset.nombre = equipo.nombre_equipo || "";
+        row.dataset.serial = equipo.serial || "";
+        row.dataset.placa = equipo.placa || "";
+        row.dataset.modelo = equipo.modelo || "";
+        row.dataset.marca = equipo.marca_id || "";
+        row.dataset.tipo = equipo.tipo_equipo_id || "";
+        row.dataset.estado = equipo.estado_id || "";
+        row.dataset.piso = equipo.piso_id || "";
+        row.dataset.ciudad = equipo.ciudad || "";
+        row.dataset.edificio = equipo.edificio || "";
+        row.dataset.usuario = equipo.usuario_modifica || "";
+        const accionHTML = esServicio
+          ? `<span style="color:#64748b">No permitido</span>`
+          : `
+              <button class="btn btn-secondary" onclick="editarEquipo(${equipo.id})"><span class="btn-icon">${iconEdit}</span>Modificar</button>
+              <button class="btn btn-danger" onclick="eliminarEquipo(${equipo.id})"><span class="btn-icon">${iconTrash}</span>Eliminar</button>
+            `;
+        row.innerHTML = `
+          <td>${equipo.id || ""}</td>
+          <td>${equipo.nombre_equipo || ""}</td>
+          <td>${equipo.serial || ""}</td>
+          <td>${equipo.placa || ""}</td>
+          <td>${equipo.modelo || ""}</td>
+          <td>${equipo.marca_id || ""}</td>
+          <td>${equipo.tipo_equipo_id || ""}</td>
+          <td>${equipo.estado_id || ""}</td>
+          <td>${equipo.piso_id || ""}</td>
+          <td>${equipo.ciudad || ""}</td>
+          <td>${equipo.edificio || ""}</td>
+          <td>${equipo.usuario_modifica || ""}</td>
+          <td class="actions-cell">${accionHTML}</td>
+        `;
+        body.appendChild(row);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error al cargar la lista de equipos");
+    });
+}
+
+function updateStats(data) {
+  const total = data.length;
+  document.getElementById("statTotal").textContent = total;
+}
+
+function editarEquipo(id) {
+  const row = document.getElementById(`equipo-row-${id}`);
+  if (!row) return;
+
+  document.getElementById("nombre").value = row.dataset.nombre;
+  document.getElementById("serial").value = row.dataset.serial;
+  document.getElementById("placa").value = row.dataset.placa;
+  document.getElementById("modelo").value = row.dataset.modelo;
+  document.getElementById("marca").value = row.dataset.marca;
+  document.getElementById("tipo").value = row.dataset.tipo;
+  document.getElementById("estado").value = row.dataset.estado;
+  document.getElementById("piso").value = row.dataset.piso;
+  document.getElementById("ciudad").value = row.dataset.ciudad;
+  document.getElementById("edificio").value = row.dataset.edificio;
+  document.getElementById("usuario").value = row.dataset.usuario;
+
+  equipoEditandoId = id;
+  modoEdicionTexto.textContent = `Editando equipo ${id}. Modifica los datos y presiona Guardar Cambios.`;
+  modoEdicionTexto.style.display = "block";
+  const saveButton = document.querySelector("button[onclick='guardarEquipo()']");
+  if (saveButton) saveButton.textContent = "Guardar Cambios";
+  const cancelBtn = document.getElementById("cancelEditBtn");
+  if (cancelBtn) cancelBtn.style.display = "inline-flex";
+}
+
+function solicitarPasswordAdmin(accion) {
+  const password = prompt("Ingrese la contraseña de administrador:");
+  if (password === null) return null;
+  if (password !== "123") {
+    alert("Contraseña incorrecta. No se puede continuar.");
+    return null;
+  }
+  return password;
+}
+
+function actualizarEquipo(id) {
+  const adminPassword = solicitarPasswordAdmin("modificar este equipo");
+  if (!adminPassword) return;
+
+  fetch(`http://localhost:3000/equipos/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "x-user-role": usuario.rol,
+      "x-admin-password": adminPassword
+    },
+    body: JSON.stringify({
+      nombre_equipo: document.getElementById("nombre").value,
+      serial: document.getElementById("serial").value,
+      placa: document.getElementById("placa").value,
+      modelo: document.getElementById("modelo").value,
+      marca_id: document.getElementById("marca").value,
+      tipo_equipo_id: document.getElementById("tipo").value,
+      estado_id: document.getElementById("estado").value,
+      piso_id: document.getElementById("piso").value,
+      ciudad: document.getElementById("ciudad").value,
+      edificio: document.getElementById("edificio").value,
+      usuario_modifica: document.getElementById("usuario").value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+      cancelarEdicion();
+      loadEquipos();
+    } else {
+      alert(data.message || "No se pudo actualizar el equipo");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error al actualizar el equipo");
+  });
+}
+
+function cancelarEdicion() {
+  equipoEditandoId = null;
+  modoEdicionTexto.style.display = "none";
+  const saveButton = document.querySelector("button[onclick='guardarEquipo()']");
+  if (saveButton) saveButton.textContent = "Guardar Equipo";
+  const cancelBtn = document.getElementById("cancelEditBtn");
+  if (cancelBtn) cancelBtn.style.display = "none";
+  clearForm();
+}
+
+function eliminarEquipo(id) {
+  if (esServicio) {
+    alert("No tienes permisos para eliminar equipos");
+    return;
+  }
+  if (!confirm("¿Eliminar este equipo?")) return;
+
+  const adminPassword = solicitarPasswordAdmin("eliminar este equipo");
+  if (!adminPassword) return;
+
+  fetch(`http://localhost:3000/equipos/${id}`, {
+    method: "DELETE",
+    headers: {
+      "x-user-role": usuario.rol,
+      "x-admin-password": adminPassword
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+      loadEquipos();
+    } else {
+      alert(data.message || "No se pudo eliminar el equipo");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error al eliminar el equipo");
+  });
+}
+
+function clearForm() {
+  ["nombre", "serial", "placa", "modelo", "marca", "tipo", "estado", "piso", "ciudad", "edificio", "usuario"].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = "";
+  });
+}
+</script>
+
+</body>
+</html>  ["nombre", "serial", "placa", "modelo", "marca", "tipo", "estado", "piso", "ciudad", "edificio", "usuario"].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = "";
+  });
+}
+</script>
+
+</body>
+</html>
+

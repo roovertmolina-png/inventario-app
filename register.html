@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="auth-card">
+  <h2>Crear cuenta</h2>
+  <p class="subtitle">Regístrate como administrador o servicio para comenzar.</p>
+
+  <div class="form-grid">
+    <input id="correo" class="input-field" placeholder="Correo">
+    <input id="password" class="input-field" type="password" placeholder="Contraseña">
+    <select id="rol" class="select-field form-grid-full">
+      <option value="">Selecciona un rol</option>
+      <option value="servicio">Servicio</option>
+      <option value="administrador">Administrador</option>
+    </select>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-primary" onclick="register()">Registrarse</button>
+  </div>
+
+  <p id="mensaje" class="message"></p>
+  <p class="footer-link"><a href="login.html">¿Ya tienes cuenta? Inicia sesión</a></p>
+</div>
+
+<script>
+function register() {
+  const correo = document.getElementById("correo").value;
+  const password = document.getElementById("password").value;
+  const rol = document.getElementById("rol").value;
+
+  if (!correo || !password || !rol) {
+    document.getElementById("mensaje").innerText = "Todos los campos son obligatorios";
+    return;
+  }
+
+  fetch("http://localhost:3000/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      correo: correo,
+      password: password,
+      rol: rol
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById("mensaje").innerText = "Usuario registrado correctamente. Ahora puedes iniciar sesión.";
+    } else {
+      document.getElementById("mensaje").innerText = data.message;
+    }
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    document.getElementById("mensaje").innerText = "Error de conexión al servidor";
+  });
+}
+</script>
+
+</body>
+</html></content>
+<parameter name="filePath">c:\Users\PC\Desktop\inventario-app\register.html

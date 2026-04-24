@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="main-shell">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Usuarios</h1>
+      <p class="subtitle">Administra cuentas de servicio y administrador.</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="index.html">Volver a equipos</a>
+      <button class="btn btn-secondary" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="usuariosBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+  const esServicio = usuario && usuario.rol === "servicio";
+  if (!usuario) {
+    window.location.href = "login.html";
+  }
+
+  window.addEventListener("load", () => {
+    loadUsuarios();
+  });
+
+  function logout() {
+    localStorage.removeItem("usuario");
+    window.location.href = "login.html";
+  }
+
+  function loadUsuarios() {
+    fetch("http://localhost:3000/usuarios")
+      .then(res => res.json())
+      .then(data => {
+        const body = document.getElementById("usuariosBody");
+        body.innerHTML = "";
+        if (!Array.isArray(data)) return;
+        data.forEach(usuario => {
+          const row = document.createElement("tr");
+          const accionHTML = esServicio
+            ? `<span style="color:#64748b">No permitido</span>`
+            : `<button class="btn btn-danger" onclick="eliminarUsuario(${usuario.id})">Eliminar</button>`;
+          row.innerHTML = `
+            <td>${usuario.id || ""}</td>
+            <td>${usuario.correo || ""}</td>
+            <td>${usuario.rol || ""}</td>
+            <td class="actions-cell">${accionHTML}</td>
+          `;
+          body.appendChild(row);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error al cargar usuarios");
+      });
+  }
+
+  function solicitarPasswordAdmin(accion) {
+    const password = prompt(`Ingrese la contraseña 123 para ${accion}:`);
+    if (password === null) return null;
+    if (password !== "123") {
+      alert("Contraseña incorrecta. No se puede continuar.");
+      return null;
+    }
+    return password;
+  }
+
+  function eliminarUsuario(id) {
+    if (esServicio) {
+      alert("No tienes permisos para eliminar usuarios");
+      return;
+    }
+    if (!confirm("¿Eliminar este usuario?")) return;
+
+    const adminPassword = solicitarPasswordAdmin("eliminar este usuario");
+    if (!adminPassword) return;
+
+    fetch(`http://localhost:3000/usuarios/${id}`, {
+      method: "DELETE",
+      headers: {
+        "x-user-role": usuario.rol,
+        "x-admin-password": adminPassword
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          loadUsuarios();
+        } else {
+          alert(data.message || "No se pudo eliminar el usuario");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error al eliminar el usuario");
+      });
+  }
+</script>
+
+</body>
+</html>
