@@ -41,28 +41,30 @@ function register() {
     return;
   }
 
-  fetch("http://localhost:3000/register", {
+  fetch("/register", {   <!-- 👈 CAMBIO IMPORTANTE -->
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      correo: correo,
-      password: password,
-      rol: rol
+      correo,
+      password,
+      rol
     })
   })
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      document.getElementById("mensaje").innerText = "Usuario registrado correctamente. Ahora puedes iniciar sesión.";
+      document.getElementById("mensaje").innerText =
+        "Usuario registrado correctamente. Ahora puedes iniciar sesión.";
     } else {
       document.getElementById("mensaje").innerText = data.message;
     }
   })
   .catch(error => {
     console.error("Error:", error);
-    document.getElementById("mensaje").innerText = "Error de conexión al servidor";
+    document.getElementById("mensaje").innerText =
+      "Error de conexión al servidor";
   });
 }
 </script>
