@@ -1,193 +1,55 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inventario Tecnológico</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory App</title>
 </head>
-
 <body>
-<div class="main-shell">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Inventario Tecnológico</h1>
-      <p class="subtitle">Registra y gestiona los equipos con una experiencia moderna y clara.</p>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn-secondary" onclick="logout()">
-        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17l5-5-5-5v3H9v4h7v3zM8 5h2v14H8V5z"/></svg></span>
-        Cerrar sesión
-      </button>
-      <a class="btn btn-ghost" href="usuarios.html">
-        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C13 14.17 8.33 13 6 13zm10 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></span>
-        Administrar usuarios
-      </a>
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <span class="stat-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14.5h-2v-2h2v2zm0-4h-2V7h2v5.5z"/></svg></span>
-      <div>
-        <p class="stat-label">Total equipos</p>
-        <p id="statTotal" class="stat-value">0</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Registrar Equipo</h2>
-
-    <div class="form-grid">
-      <input id="nombre" class="input-field" placeholder="Nombre del equipo">
-      <input id="serial" class="input-field" placeholder="Serial">
-      <input id="placa" class="input-field" placeholder="Placa">
-      <input id="modelo" class="input-field" placeholder="Modelo">
-      <input id="marca" class="input-field" placeholder="ID Marca (ej: 1)">
-      <input id="tipo" class="input-field" placeholder="ID Tipo (ej: 1)">
-      <input id="estado" class="input-field" placeholder="ID Estado (ej: 1)">
-      <input id="piso" class="input-field" placeholder="ID Piso (ej: 1)">
-      <input id="ciudad" class="input-field" placeholder="Ciudad donde se ubica">
-      <input id="edificio" class="input-field" placeholder="Edificio donde se ubica">
-      <input id="usuario" class="input-field" placeholder="ID Usuario (ej: 1)">
-    </div>
-
-    <div class="action-row">
-      <button class="btn btn-primary" onclick="guardarEquipo()">
-        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-6 16.5L6.5 15H9v-4h6v4h2.5L11 19.5zM13 9H7V5h6v4z"/></svg></span>
-        Guardar Equipo
-      </button>
-      <button id="cancelEditBtn" class="btn btn-secondary" onclick="cancelarEdicion()" style="display:none;">
-        <span class="btn-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-6.29 6.3-1.42-1.42L10.59 12 4.29 5.71 5.71 4.29 12 10.59l6.29-6.3z"/></svg></span>
-        Cancelar edición
-      </button>
-    </div>
-
-    <p id="modoEdicionTexto" class="status-text" style="display:none;"></p>
-  </div>
-
-  <div class="card">
-    <h2>Lista de equipos</h2>
-    <div class="table-wrap">
-      <table class="table-modern" id="equiposTabla">
+    <h1>Inventory</h1>
+    <table>
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>Equipo</th>
-            <th>Serial</th>
-            <th>Placa</th>
-            <th>Modelo</th>
-            <th>Marca</th>
-            <th>Tipo</th>
-            <th>Estado</th>
-            <th>Piso</th>
-            <th>Ciudad</th>
-            <th>Edificio</th>
-            <th>Usuario</th>
-            <th>Acciones</th>
-          </tr>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
         </thead>
-        <tbody id="equiposBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+        <tbody id="inventoryTable">
+            <!-- Dynamic rows will be added here -->
+        </tbody>
+    </table>
 
-<script>
-const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
-const esServicio = usuario && usuario.rol === "servicio";
+    <script>
+        loadEquipos();
 
-let equipoEditandoId = null;
+        function loadEquipos() {
+            // Example AJAX call to load equipment data
+            // This function should fetch and populate the inventory table
+            fetch('/api/equipos')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('inventoryTable');
+                    tableBody.innerHTML = '';
+                    data.forEach(equipo => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td>${equipo.id}</td><td>${equipo.name}</td><td><button onclick="editEquipo(${equipo.id})">Edit</button><button onclick="deleteEquipo(${equipo.id})">Delete</button></td>`;
+                        tableBody.appendChild(row);
+                    });
+                });
+        }
 
-if (!usuario) {
-  window.location.href = "login.html";
-}
+        function editEquipo(id) {
+            // Function to edit equipment details
+            console.log('Editing equipment with ID:', id);
+            // Implement your edit logic here
+        }
 
-function logout() {
-  localStorage.removeItem("usuario");
-  window.location.href = "login.html";
-}
-
-// ✔ FIX PRINCIPAL: SIN localhost
-function guardarEquipo() {
-  fetch("/equipos", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-user-role": usuario.rol
-    },
-    body: JSON.stringify({
-      nombre_equipo: document.getElementById("nombre").value,
-      serial: document.getElementById("serial").value,
-      placa: document.getElementById("placa").value,
-      modelo: document.getElementById("modelo").value,
-      marca_id: document.getElementById("marca").value,
-      tipo_equipo_id: document.getElementById("tipo").value,
-      estado_id: document.getElementById("estado").value,
-      piso_id: document.getElementById("piso").value,
-      ciudad: document.getElementById("ciudad").value,
-      edificio: document.getElementById("edificio").value,
-      usuario_modifica: document.getElementById("usuario").value
-    })
-  })
-  .then(res => res.text())
-  .then(data => {
-    alert(data);
-    loadEquipos();
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Error al guardar");
-  });
-}
-
-// ✔ FIX PRINCIPAL
-function loadEquipos() {
-  fetch("/equipos")
-    .then(res => res.json())
-    .then(data => {
-      const body = document.getElementById("equiposBody");
-      body.innerHTML = "";
-
-      data.forEach(e => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-          <td>${e.id}</td>
-          <td>${e.nombre_equipo}</td>
-          <td>${e.serial}</td>
-          <td>${e.placa}</td>
-          <td>${e.modelo}</td>
-          <td>${e.marca_id}</td>
-          <td>${e.tipo_equipo_id}</td>
-          <td>${e.estado_id}</td>
-          <td>${e.piso_id}</td>
-          <td>${e.ciudad}</td>
-          <td>${e.edificio}</td>
-          <td>${e.usuario_modifica}</td>
-        `;
-
-        body.appendChild(row);
-      });
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error al cargar equipos");
-    });
-}
-
-window.onload = loadEquipos;
-</script>
-
-</body>
-</html>  ["nombre", "serial", "placa", "modelo", "marca", "tipo", "estado", "piso", "ciudad", "edificio", "usuario"].forEach(id => {
-    const input = document.getElementById(id);
-    if (input) input.value = "";
-  });
-}
-</script>
-
+        function deleteEquipo(id) {
+            // Function to delete equipment
+            console.log('Deleting equipment with ID:', id);
+            // Implement your delete logic here
+        }
+    </script>
 </body>
 </html>
-
