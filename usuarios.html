@@ -40,6 +40,7 @@
 <script>
   const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
   const esServicio = usuario && usuario.rol === "servicio";
+
   if (!usuario) {
     window.location.href = "login.html";
   }
@@ -54,23 +55,28 @@
   }
 
   function loadUsuarios() {
-    fetch("http://localhost:3000/usuarios")
+    fetch("/usuarios")   <!-- 👈 CAMBIO IMPORTANTE -->
       .then(res => res.json())
       .then(data => {
         const body = document.getElementById("usuariosBody");
         body.innerHTML = "";
+
         if (!Array.isArray(data)) return;
+
         data.forEach(usuario => {
           const row = document.createElement("tr");
+
           const accionHTML = esServicio
             ? `<span style="color:#64748b">No permitido</span>`
             : `<button class="btn btn-danger" onclick="eliminarUsuario(${usuario.id})">Eliminar</button>`;
+
           row.innerHTML = `
             <td>${usuario.id || ""}</td>
             <td>${usuario.correo || ""}</td>
             <td>${usuario.rol || ""}</td>
             <td class="actions-cell">${accionHTML}</td>
           `;
+
           body.appendChild(row);
         });
       })
@@ -84,7 +90,7 @@
     const password = prompt(`Ingrese la contraseña 123 para ${accion}:`);
     if (password === null) return null;
     if (password !== "123") {
-      alert("Contraseña incorrecta. No se puede continuar.");
+      alert("Contraseña incorrecta");
       return null;
     }
     return password;
@@ -95,12 +101,13 @@
       alert("No tienes permisos para eliminar usuarios");
       return;
     }
+
     if (!confirm("¿Eliminar este usuario?")) return;
 
     const adminPassword = solicitarPasswordAdmin("eliminar este usuario");
     if (!adminPassword) return;
 
-    fetch(`http://localhost:3000/usuarios/${id}`, {
+    fetch(`/usuarios/${id}`, {   <!-- 👈 CAMBIO IMPORTANTE -->
       method: "DELETE",
       headers: {
         "x-user-role": usuario.rol,
@@ -113,12 +120,12 @@
           alert(data.message);
           loadUsuarios();
         } else {
-          alert(data.message || "No se pudo eliminar el usuario");
+          alert(data.message || "No se pudo eliminar");
         }
       })
       .catch(err => {
         console.error(err);
-        alert("Error al eliminar el usuario");
+        alert("Error al eliminar usuario");
       });
   }
 </script>
