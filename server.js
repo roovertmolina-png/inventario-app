@@ -29,31 +29,6 @@ require('dotenv').config();
 console.log("PASSWORD:", process.env.DB_PASSWORD);
 
 
-db.connect(err => {
-  if (err) {
-    console.log("Error de conexión:", err);
-  } else {
-    console.log("Conectado a la base de datos");
-  }
-});
-
-db.connect(err => {
-  if (err) {
-    console.log("Error de conexión:", err);
-  } else {
-    console.log("Conectado a la base de datos");
-
-    // 👇 PRUEBA REAL
-    db.query("SELECT * FROM usuarios", (err, results) => {
-      if (err) {
-        console.log("Error en la consulta:", err);
-      } else {
-        console.log("Datos:", results);
-      }
-    });
-
-  }
-});
 
 function ensureCiudad(ciudadNombre, callback) {
   if (!ciudadNombre) {
