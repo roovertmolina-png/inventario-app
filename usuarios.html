@@ -55,7 +55,7 @@
   }
 
   function loadUsuarios() {
-    fetch("/usuarios")   <!-- 👈 CAMBIO IMPORTANTE -->
+    fetch("/usuarios")
       .then(res => res.json())
       .then(data => {
         const body = document.getElementById("usuariosBody");
@@ -107,7 +107,7 @@
     const adminPassword = solicitarPasswordAdmin("eliminar este usuario");
     if (!adminPassword) return;
 
-    fetch(`/usuarios/${id}`, {   <!-- 👈 CAMBIO IMPORTANTE -->
+    fetch(`/usuarios/${id}`, {
       method: "DELETE",
       headers: {
         "x-user-role": usuario.rol,
