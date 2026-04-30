@@ -277,19 +277,19 @@ app.post("/equipos", (req, res) => {
     ], (err, result) => {
       if (err) {
         console.log(err);
-        return res.status(500).send("Error al guardar");
+        return res.status(500).json({ success: false, message: "Error al guardar" });
       }
-      res.send("Equipo guardado correctamente");
+      res.json({ success: true, message: "Equipo guardado correctamente" });
     });
   }
 
   ensureCiudad(ciudad, (err, ciudadId) => {
     if (err) {
-      return res.status(500).send("Error al procesar ciudad");
+      return res.status(500).json({ success: false, message: "Error al procesar ciudad" });
     }
     ensureEdificio(edificio, (err, edificioId) => {
       if (err) {
-        return res.status(500).send("Error al procesar edificio");
+        return res.status(500).json({ success: false, message: "Error al procesar edificio" });
       }
       insertEquipo(ciudadId, edificioId);
     });
