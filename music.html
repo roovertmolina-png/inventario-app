@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reproductor de Música</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      text-align: center;
+    }
+    .player {
+      width: 400px;
+      margin: 40px auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    select, button {
+      margin: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      cursor: pointer;
+      background: #1db954;
+      color: white;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 5px;
+      cursor: pointer;
+    }
+    li:hover {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="player">
+  <h2>🎵 Reproductor de Música</h2>
+
+  <!-- Selector de género -->
+  <label for="genre">Selecciona género:</label>
+  <select id="genre" onchange="loadSongs()">
+    <option value="rock">Rock</option>
+    <option value="pop">Pop</option>
+    <option value="electronic">Electrónica</option>
+  </select>
+
+  <!-- Lista de canciones -->
+  <ul id="songList"></ul>
+
+  <!-- Reproductor -->
+  <audio id="audioPlayer" controls>
+    <source id="audioSource" src="" type="audio/mpeg">
+    Tu navegador no soporta audio.
+  </audio>
+</div>
+
+<script>
+  const songs = {
+    rock: [
+      { name: "Canción Rock 1", file: "music/rock1.mp3" },
+      { name: "Canción Rock 2", file: "music/rock2.ogg" }
+    ],
+    pop: [
+      { name: "Canción Pop 1", file: "music/pop1.mp3" },
+      { name: "Canción Pop 2", file: "music/pop2.wav" }
+    ],
+    electronic: [
+      { name: "Electrónica 1", file: "music/electro1.mp3" },
+      { name: "Electrónica 2", file: "music/electro2.ogg" }
+    ]
+  };
+
+  function loadSongs() {
+    const genre = document.getElementById("genre").value;
+    const songList = document.getElementById("songList");
+    songList.innerHTML = "";
+
+    songs[genre].forEach(song => {
+      const li = document.createElement("li");
+      li.textContent = song.name;
+      li.onclick = () => playSong(song.file);
+      songList.appendChild(li);
+    });
+  }
+
+  function playSong(file) {
+    const player = document.getElementById("audioPlayer");
+    const source = document.getElementById("audioSource");
+
+    source.src = file;
+    player.load();
+    player.play();
+  }
+
+  // Cargar canciones al iniciar
+  loadSongs();
+</script>
+
+</body>
+</html>
