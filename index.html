@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -150,7 +150,7 @@
         <h2>Historial de cambios</h2>
         <p class="subtitle">Ultimas acciones realizadas sobre los equipos.</p>
       </div>
-      <button class="btn btn-secondary" onclick="loadHistorial()">Actualizar historial</button>
+      <button id="refreshHistorialBtn" class="btn btn-secondary" type="button">Actualizar historial</button>
     </div>
     <div class="table-wrap">
       <table class="table-modern" id="historialTabla">
@@ -186,6 +186,11 @@
     prepararPermisos();
     loadEquipos();
     loadHistorial();
+
+    const refreshHistorialBtn = document.getElementById("refreshHistorialBtn");
+    if (refreshHistorialBtn) {
+      refreshHistorialBtn.addEventListener("click", () => loadHistorial());
+    }
   });
 
   function prepararPermisos() {
@@ -452,10 +457,21 @@
 
 
   function loadHistorial() {
-    fetch("/historial")
+    const body = document.getElementById("historialBody");
+    const refreshHistorialBtn = document.getElementById("refreshHistorialBtn");
+
+    if (refreshHistorialBtn) {
+      refreshHistorialBtn.disabled = true;
+      refreshHistorialBtn.textContent = "Actualizando...";
+    }
+
+    if (body) {
+      body.innerHTML = '<tr><td colspan="6" style="text-align:center;">Cargando historial...</td></tr>';
+    }
+
+    fetch("/historial?ts=" + Date.now(), { cache: "no-store" })
       .then(parseJsonResponse)
       .then(data => {
-        const body = document.getElementById("historialBody");
         if (!body) return;
 
         body.innerHTML = "";
@@ -484,8 +500,16 @@
         if (body) {
           body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;">Error al cargar historial: ${err.message}</td></tr>`;
         }
+      })
+      .finally(() => {
+        if (refreshHistorialBtn) {
+          refreshHistorialBtn.disabled = false;
+          refreshHistorialBtn.textContent = "Actualizar historial";
+        }
       });
   }
+
+  window.loadHistorial = loadHistorial;
 
   function claseAccion(accion) {
     if (accion === "CREACION") return "history-create";
@@ -525,4 +549,5 @@
 
 </body>
 </html>
+
 
