@@ -514,7 +514,7 @@
   function claseAccion(accion) {
     if (accion === "CREACION") return "history-create";
     if (accion === "MODIFICACION") return "history-update";
-    if (accion === "ELIMINACION") return "history-delete";
+    if (accion === "ELIMINACION" || accion === "ELIMINACION_USUARIO") return "history-delete";
     return "";
   }
 

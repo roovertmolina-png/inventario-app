@@ -324,17 +324,40 @@ app.delete("/usuarios/:id", verifyAdminPassword, (req, res) => {
   if (getUserRole(req) === "servicio") {
     return res.status(403).json({ success: false, message: "No autorizado: usuario servicio no puede eliminar usuarios" });
   }
+
   const { id } = req.params;
-  const sql = "DELETE FROM usuarios WHERE id = ?";
-  db.query(sql, [id], (err, result) => {
+  const findSql = "SELECT id, correo, rol FROM usuarios WHERE id = ? LIMIT 1";
+
+  db.query(findSql, [id], (err, rows) => {
     if (err) {
       console.log(err);
-      return res.status(500).json({ success: false, message: "Error al eliminar" });
+      return res.status(500).json({ success: false, message: "Error al buscar usuario" });
     }
-    if (result.affectedRows === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ success: false, message: "Usuario no encontrado" });
     }
-    res.json({ success: true, message: "Usuario eliminado correctamente" });
+
+    const usuarioEliminado = rows[0];
+    const sql = "DELETE FROM usuarios WHERE id = ?";
+
+    db.query(sql, [id], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ success: false, message: "Error al eliminar" });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+      }
+
+      registrarHistorial(req, "ELIMINACION_USUARIO", null, {
+        nombre_equipo: usuarioEliminado.correo,
+        serial: usuarioEliminado.rol
+      }, {
+        usuario_eliminado: usuarioEliminado
+      }, () => {
+        res.json({ success: true, message: "Usuario eliminado correctamente" });
+      });
+    });
   });
 });
 
