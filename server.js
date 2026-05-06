@@ -18,15 +18,68 @@ const ADMIN_PASSWORD = "123";
 function verifyAdminPassword(req, res, next) {
   const password = (req.headers["x-admin-password"] || req.body.adminPassword || req.query.adminPassword || "").toString();
   if (password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, message: "ContraseÃ±a incorrecta. Debes usar la contraseÃ±a 123 para modificar o eliminar." });
+    return res.status(401).json({ success: false, message: "Contrasena incorrecta. Debes usar la contrasena 123 para modificar o eliminar." });
   }
   next();
+}
+
+
+function getUserEmail(req) {
+  return (req.headers["x-user-email"] || req.body.usuario_correo || "").toString();
+}
+
+function initHistorialCambios() {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS historial_cambios (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      equipo_id INT NULL,
+      accion VARCHAR(30) NOT NULL,
+      equipo_nombre VARCHAR(150) NULL,
+      serial VARCHAR(150) NULL,
+      usuario_correo VARCHAR(255) NULL,
+      usuario_rol VARCHAR(50) NULL,
+      detalles JSON NULL,
+      creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+
+  db.query(sql, (err) => {
+    if (err) {
+      console.log("Error creando historial_cambios:", err);
+    } else {
+      console.log("Tabla historial_cambios lista");
+    }
+  });
+}
+
+function registrarHistorial(req, accion, equipoId, equipo, detalles, callback) {
+  const sql = `
+    INSERT INTO historial_cambios
+    (equipo_id, accion, equipo_nombre, serial, usuario_correo, usuario_rol, detalles)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [
+    equipoId || null,
+    accion,
+    equipo && equipo.nombre_equipo ? equipo.nombre_equipo : null,
+    equipo && equipo.serial ? equipo.serial : null,
+    getUserEmail(req) || null,
+    getUserRole(req) || null,
+    JSON.stringify(detalles || {})
+  ], (err) => {
+    if (err) {
+      console.log("Error registrando historial:", err);
+    }
+    if (callback) callback();
+  });
 }
 
 // CONEXIÃ“N A MARIADB (XAMPP)
 require('dotenv').config();
 
 console.log("PASSWORD:", process.env.DB_PASSWORD);
+initHistorialCambios();
 
 
 
@@ -97,6 +150,24 @@ app.get("/equipos", (req, res) => {
   });
 });
 
+// RUTA PARA LISTAR HISTORIAL DE CAMBIOS
+app.get("/historial", (req, res) => {
+  const sql = `
+    SELECT id, equipo_id, accion, equipo_nombre, serial, usuario_correo, usuario_rol, detalles, creado_en
+    FROM historial_cambios
+    ORDER BY creado_en DESC, id DESC
+    LIMIT 100
+  `;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ success: false, message: "Error al cargar historial" });
+    }
+    res.json(result);
+  });
+});
+
 // RUTA PARA LISTAR CIUDADES
 app.get("/ciudades", (req, res) => {
   const sql = "SELECT id, nombres FROM ciudades";
@@ -114,17 +185,35 @@ app.delete("/equipos/:id", verifyAdminPassword, (req, res) => {
   if (getUserRole(req) === "servicio") {
     return res.status(403).json({ success: false, message: "No autorizado: usuario servicio no puede eliminar equipos" });
   }
+
   const { id } = req.params;
-  const sql = "DELETE FROM equipos WHERE id = ?";
-  db.query(sql, [id], (err, result) => {
+  const findSql = "SELECT * FROM equipos WHERE id = ? LIMIT 1";
+
+  db.query(findSql, [id], (err, rows) => {
     if (err) {
       console.log(err);
-      return res.status(500).json({ success: false, message: "Error al eliminar" });
+      return res.status(500).json({ success: false, message: "Error al buscar equipo" });
     }
-    if (result.affectedRows === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ success: false, message: "Equipo no encontrado" });
     }
-    res.json({ success: true, message: "Equipo eliminado correctamente" });
+
+    const equipoEliminado = rows[0];
+    const sql = "DELETE FROM equipos WHERE id = ?";
+
+    db.query(sql, [id], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ success: false, message: "Error al eliminar" });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Equipo no encontrado" });
+      }
+
+      registrarHistorial(req, "ELIMINACION", id, equipoEliminado, { equipo: equipoEliminado }, () => {
+        res.json({ success: true, message: "Equipo eliminado correctamente" });
+      });
+    });
   });
 });
 
@@ -187,7 +276,21 @@ app.put("/equipos/:id", verifyAdminPassword, (req, res) => {
       if (result.affectedRows === 0) {
         return res.status(404).json({ success: false, message: "Equipo no encontrado" });
       }
-      res.json({ success: true, message: "Equipo actualizado correctamente" });
+      registrarHistorial(req, "MODIFICACION", id, { nombre_equipo, serial }, {
+        nombre_equipo,
+        serial,
+        placa,
+        modelo,
+        marca_id,
+        tipo_equipo_id,
+        estado_id,
+        piso_id,
+        ciudad,
+        edificio,
+        usuario_modifica
+      }, () => {
+        res.json({ success: true, message: "Equipo actualizado correctamente" });
+      });
     });
   }
 
@@ -279,7 +382,21 @@ app.post("/equipos", (req, res) => {
         console.log(err);
         return res.status(500).json({ success: false, message: "Error al guardar" });
       }
-      res.json({ success: true, message: "Equipo guardado correctamente" });
+      registrarHistorial(req, "CREACION", result.insertId, { nombre_equipo, serial }, {
+        nombre_equipo,
+        serial,
+        placa,
+        modelo,
+        marca_id,
+        tipo_equipo_id,
+        estado_id,
+        piso_id,
+        ciudad,
+        edificio,
+        usuario_modifica
+      }, () => {
+        res.json({ success: true, message: "Equipo guardado correctamente" });
+      });
     });
   }
 

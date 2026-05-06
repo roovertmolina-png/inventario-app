@@ -142,6 +142,32 @@
       </table>
     </div>
   </div>
+
+
+  <div class="card">
+    <div class="section-heading">
+      <div>
+        <h2>Historial de cambios</h2>
+        <p class="subtitle">Ultimas acciones realizadas sobre los equipos.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="loadHistorial()">Actualizar historial</button>
+    </div>
+    <div class="table-wrap">
+      <table class="table-modern" id="historialTabla">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Accion</th>
+            <th>Equipo</th>
+            <th>Serial</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+          </tr>
+        </thead>
+        <tbody id="historialBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -159,6 +185,7 @@
   window.addEventListener("load", () => {
     prepararPermisos();
     loadEquipos();
+    loadHistorial();
   });
 
   function prepararPermisos() {
@@ -229,6 +256,7 @@
       headers: {
         "Content-Type": "application/json",
         "x-user-role": usuario.rol,
+        "x-user-email": usuario.correo || "",
         "x-admin-password": adminPassword
       },
       body: JSON.stringify(equipo)
@@ -239,6 +267,7 @@
           alert(data.message || (esEdicion ? "Equipo actualizado correctamente" : "Equipo guardado correctamente"));
           cancelarEdicion();
           loadEquipos();
+          loadHistorial();
         } else {
           alert(data.message || "No se pudo guardar el equipo");
         }
@@ -382,6 +411,7 @@
       method: "DELETE",
       headers: {
         "x-user-role": usuario.rol,
+        "x-user-email": usuario.correo || "",
         "x-admin-password": adminPassword
       }
     })
@@ -391,6 +421,7 @@
           alert(data.message || "Equipo eliminado correctamente");
           if (equipoEditandoId === id) cancelarEdicion();
           loadEquipos();
+          loadHistorial();
         } else {
           alert(data.message || "No se pudo eliminar el equipo");
         }
@@ -417,6 +448,69 @@
       if (input) input.value = "";
     });
   }
+
+
+
+  function loadHistorial() {
+    fetch("/historial")
+      .then(parseJsonResponse)
+      .then(data => {
+        const body = document.getElementById("historialBody");
+        if (!body) return;
+
+        body.innerHTML = "";
+
+        if (!Array.isArray(data) || data.length === 0) {
+          body.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay cambios registrados todavia</td></tr>';
+          return;
+        }
+
+        data.forEach(item => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${formatearFecha(item.creado_en)}</td>
+            <td><span class="history-badge ${claseAccion(item.accion)}">${escapeHtml(item.accion || "")}</span></td>
+            <td>${escapeHtml(item.equipo_nombre || ("Equipo ID " + (item.equipo_id || "")))}</td>
+            <td>${escapeHtml(item.serial || "")}</td>
+            <td>${escapeHtml(item.usuario_correo || "No registrado")}</td>
+            <td>${escapeHtml(item.usuario_rol || "")}</td>
+          `;
+          body.appendChild(row);
+        });
+      })
+      .catch(err => {
+        console.error("Error al cargar historial:", err);
+        const body = document.getElementById("historialBody");
+        if (body) {
+          body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;">Error al cargar historial: ${err.message}</td></tr>`;
+        }
+      });
+  }
+
+  function claseAccion(accion) {
+    if (accion === "CREACION") return "history-create";
+    if (accion === "MODIFICACION") return "history-update";
+    if (accion === "ELIMINACION") return "history-delete";
+    return "";
+  }
+
+  function formatearFecha(fecha) {
+    if (!fecha) return "";
+    return new Date(fecha).toLocaleString("es-CO", {
+      dateStyle: "short",
+      timeStyle: "short"
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
 
   function parseJsonResponse(res) {
     return res.json().then(data => {

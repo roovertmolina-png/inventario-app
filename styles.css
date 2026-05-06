@@ -316,3 +316,43 @@ a:hover {
   }
 }
 
+
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.history-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.history-create {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.history-update {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.history-delete {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+@media (max-width: 800px) {
+  .section-heading {
+    flex-direction: column;
+  }
+}
