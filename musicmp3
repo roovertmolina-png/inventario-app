@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ambiente de trabajo</title>
+<link rel="stylesheet" href="styles.css">
+</head>
 
+<body>
+<div class="main-shell">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Ambiente de trabajo</h1>
+      <p class="subtitle">Modulo para documentar condiciones del ambiente de trabajo.</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="index.html">Volver a equipos</a>
+      <button class="btn btn-secondary" onclick="logout()">Cerrar sesion</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Ambiente de trabajo</h2>
+    <p class="status-text">Esta seccion ya abre correctamente. Aqui puedes agregar el formulario o tabla de este modulo.</p>
+  </div>
+</div>
+
+<script>
+const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+if (!usuario) {
+  window.location.href = "login.html";
+}
+
+function logout() {
+  localStorage.removeItem("usuario");
+  window.location.href = "login.html";
+}
+</script>
+</body>
+</html>

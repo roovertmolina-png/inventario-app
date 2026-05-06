@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 
 const cors = require("cors");
 
@@ -18,12 +18,12 @@ const ADMIN_PASSWORD = "123";
 function verifyAdminPassword(req, res, next) {
   const password = (req.headers["x-admin-password"] || req.body.adminPassword || req.query.adminPassword || "").toString();
   if (password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, message: "Contraseña incorrecta. Debes usar la contraseña 123 para modificar o eliminar." });
+    return res.status(401).json({ success: false, message: "ContraseÃ±a incorrecta. Debes usar la contraseÃ±a 123 para modificar o eliminar." });
   }
   next();
 }
 
-// CONEXIÓN A MARIADB (XAMPP)
+// CONEXIÃ“N A MARIADB (XAMPP)
 require('dotenv').config();
 
 console.log("PASSWORD:", process.env.DB_PASSWORD);
@@ -335,7 +335,7 @@ app.post("/register", (req, res) => {
     if (result.length > 0) {
       return res.json({
         success: false,
-        message: "El correo ya está registrado"
+        message: "El correo ya estÃ¡ registrado"
       });
     }
 
@@ -355,7 +355,8 @@ app.post("/register", (req, res) => {
 });
 
 // INICIAR SERVIDOR
-app.listen(3000, () => {
-  console.log("Servidor corriendo en http://localhost:3000");
-});
+const PORT = process.env.PORT || 3000;
 
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});

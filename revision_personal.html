@@ -3,131 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Revisión de Personal</title>
+<title>Revision de Personal</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-
-body{
-    background:#f4f6f9;
-    padding:20px;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-}
-
-h1{
-    text-align:center;
-    margin-bottom:30px;
-    color:#2c3e50;
-}
-
-.sections{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-}
-
-.card{
-    background:#fff;
-    border-radius:15px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.1);
-    padding:20px;
-}
-
-.card h2{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:20px;
-    color:#34495e;
-}
-
-.employee{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#f8f9fb;
-    padding:12px 15px;
-    border-radius:12px;
-    margin-bottom:12px;
-    transition:0.3s;
-}
-
-.employee:hover{
-    transform:translateY(-2px);
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
-
-.name{
-    font-weight:bold;
-    color:#2c3e50;
-}
-
-.device{
-    background:#3498db;
-    color:white;
-    padding:6px 12px;
-    border-radius:20px;
-    font-size:14px;
-}
-
-.home .device{
-    background:#27ae60;
-}
-
+*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
+body{ background:#f4f6f9; padding:20px; }
+.container{ max-width:1200px; margin:auto; }
+.top-actions{ display:flex; justify-content:flex-end; gap:10px; margin-bottom:20px; }
+.btn{ border:0; border-radius:8px; padding:10px 14px; cursor:pointer; text-decoration:none; font-weight:bold; font-size:14px; }
+.btn-ghost{ background:#e8eef7; color:#2c3e50; }
+.btn-secondary{ background:#34495e; color:white; }
+h1{ text-align:center; margin-bottom:30px; color:#2c3e50; }
+.sections{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.card{ background:#fff; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.1); padding:20px; }
+.card h2{ display:flex; align-items:center; gap:10px; margin-bottom:20px; color:#34495e; }
+.employee{ display:flex; justify-content:space-between; align-items:center; background:#f8f9fb; padding:12px 15px; border-radius:12px; margin-bottom:12px; transition:0.3s; }
+.employee:hover{ transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+.name{ font-weight:bold; color:#2c3e50; }
+.device{ background:#3498db; color:white; padding:6px 12px; border-radius:20px; font-size:14px; }
+.home .device{ background:#27ae60; }
 @media(max-width:900px){
-    .sections{
-        grid-template-columns:1fr;
-    }
+  .sections{ grid-template-columns:1fr; }
+  .top-actions{ justify-content:stretch; flex-direction:column; }
 }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h1><i class="fa-solid fa-users"></i> Revisión de Personal</h1>
+  <div class="top-actions">
+    <a class="btn btn-ghost" href="index.html">Volver a equipos</a>
+    <button class="btn btn-secondary" onclick="logout()">Cerrar sesion</button>
+  </div>
 
-    <div class="sections">
+  <h1><i class="fa-solid fa-users"></i> Revision de Personal</h1>
 
-        <div class="card home">
-            <h2><i class="fa-solid fa-house-laptop"></i> Personal en Casa</h2>
-
-            <div class="employee">
-                <span class="name">Johan Cortes</span>
-                <span class="device">ID: EQ-1023</span>
-            </div>
-
-            <div class="employee">
-                <span class="name">Laura Gómez</span>
-                <span class="device">ID: EQ-1045</span>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2><i class="fa-solid fa-building"></i> Personal Presencial</h2>
-
-            <div class="employee">
-                <span class="name">María Torres</span>
-                <span class="device">ID: EQ-2011</span>
-            </div>
-
-            <div class="employee">
-                <span class="name">Andrés Pérez</span>
-                <span class="device">ID: EQ-2056</span>
-            </div>
-        </div>
-
+  <div class="sections">
+    <div class="card home">
+      <h2><i class="fa-solid fa-house-laptop"></i> Personal en Casa</h2>
+      <div class="employee">
+        <span class="name">Johan Cortes</span>
+        <span class="device">ID: EQ-1023</span>
+      </div>
+      <div class="employee">
+        <span class="name">Laura Gomez</span>
+        <span class="device">ID: EQ-1045</span>
+      </div>
     </div>
+
+    <div class="card">
+      <h2><i class="fa-solid fa-building"></i> Personal Presencial</h2>
+      <div class="employee">
+        <span class="name">Maria Torres</span>
+        <span class="device">ID: EQ-2011</span>
+      </div>
+      <div class="employee">
+        <span class="name">Andres Perez</span>
+        <span class="device">ID: EQ-2056</span>
+      </div>
+    </div>
+  </div>
 </div>
 
+<script>
+const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+if (!usuario) {
+  window.location.href = "login.html";
+}
+
+function logout() {
+  localStorage.removeItem("usuario");
+  window.location.href = "login.html";
+}
+</script>
 </body>
 </html>
