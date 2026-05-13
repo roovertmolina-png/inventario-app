@@ -1,128 +1,11 @@
-<section class="inventory-section">
-
-  <h2>💻 Adquisición y Arrendamiento de Componentes</h2>
-  <p class="subtitle">
-    Equipos tecnológicos y periféricos disponibles para empresas.
-  </p>
-
-  <!-- EQUIPOS -->
-  <div class="category">
-    <h3>🖥️ Equipos Disponibles</h3>
-
-    <div class="card">
-      <h4>Laptop Dell Latitude 5440</h4>
-      <p>Intel Core i7 - 16GB RAM - SSD 512GB</p>
-      <span class="price">$280.000 / mes</span>
-      <button>Solicitar</button>
-    </div>
-
-    <div class="card">
-      <h4>HP ProDesk Escritorio</h4>
-      <p>Intel Core i5 - 8GB RAM - SSD 256GB</p>
-      <span class="price">$210.000 / mes</span>
-      <button>Solicitar</button>
-    </div>
-
-    <div class="card">
-      <h4>MacBook Pro M2</h4>
-      <p>16GB RAM - 512GB SSD - Retina Display</p>
-      <span class="price">$450.000 / mes</span>
-      <button>Solicitar</button>
-    </div>
-
-    <div class="card">
-      <h4>Lenovo ThinkPad E14</h4>
-      <p>Ryzen 7 - 16GB RAM - SSD 1TB</p>
-      <span class="price">$320.000 / mes</span>
-      <button>Solicitar</button>
-    </div>
-  </div>
-
-  <!-- PERIFERICOS -->
-  <div class="category">
-    <h3>⌨️ Periféricos</h3>
-
-    <div class="card">
-      <h4>Teclado Mecánico RGB</h4>
-      <p>Switch Red - Retroiluminación RGB</p>
-      <span class="price">$25.000 / mes</span>
-      <button>Agregar</button>
-    </div>
-
-    <div class="card">
-      <h4>Mouse Logitech G502</h4>
-      <p>11 botones - Sensor HERO</p>
-      <span class="price">$18.000 / mes</span>
-      <button>Agregar</button>
-    </div>
-
-    <div class="card">
-      <h4>Monitor Samsung 24"</h4>
-      <p>Full HD - 75Hz</p>
-      <span class="price">$45.000 / mes</span>
-      <button>Agregar</button>
-    </div>
-
-    <div class="card">
-      <h4>Diadema HyperX Cloud II</h4>
-      <p>Audio 7.1 - Micrófono integrado</p>
-      <span class="price">$22.000 / mes</span>
-      <button>Agregar</button>
-    </div>
-  </div>
-
-  <!-- SERVICIOS -->
-  <div class="category">
-    <h3>🛠️ Servicios Incluidos</h3>
-
-    <div class="service">
-      ✅ Soporte técnico remoto 24/7
-    </div>
-
-    <div class="service">
-      ✅ Reposición inmediata por daño
-    </div>
-
-    <div class="service">
-      ✅ Mantenimiento preventivo mensual
-    </div>
-
-    <div class="service">
-      ✅ Instalación de software corporativo
-    </div>
-  </div>
-
-  <!-- RESUMEN -->
-  <div class="summary">
-    <h3>📊 Estado del Inventario</h3>
-
-    <div class="stats">
-      <div class="stat-box">
-        <span>42</span>
-        <p>Laptops Activas</p>
-      </div>
-
-      <div class="stat-box">
-        <span>18</span>
-        <p>Equipos en Mantenimiento</p>
-      </div>
-
-      <div class="stat-box">
-        <span>76</span>
-        <p>Periféricos Arrendados</p>
-      </div>
-
-      <div class="stat-box">
-        <span>1 </span>
-        <p>Empresas Asociadas</p>
-      </div>
-    </div>
-  </div>
-
-</section>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adquisicion de componentes</title>
 
 <style>
-
 /* ===== FONDO GENERAL ===== */
 
 body{
@@ -332,4 +215,177 @@ body{
 .status-text{
     color:#64748b;
 }
+
 </style>
+
+</head>
+
+<body>
+
+<div class="main-shell">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💻 Adquisicion de componentes</h1>
+      <p class="subtitle">
+        Modulo para gestionar solicitudes, arrendamientos y compras de componentes tecnologicos.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="index.html">Volver a equipos</a>
+      <button class="btn btn-secondary" onclick="logout()">Cerrar sesion</button>
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div class="card">
+    <h2>📊 Resumen general</h2>
+
+    <div class="stats">
+
+      <div class="stat-box">
+        <span>42</span>
+        <p>Laptops activas</p>
+      </div>
+
+      <div class="stat-box">
+        <span>18</span>
+        <p>Equipos en mantenimiento</p>
+      </div>
+
+      <div class="stat-box">
+        <span>76</span>
+        <p>Perifericos arrendados</p>
+      </div>
+
+      <div class="stat-box">
+        <span>12</span>
+        <p>Empresas asociadas</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EQUIPOS -->
+  <div class="inventory-section">
+
+    <div class="category">
+      <h3>🖥️ Equipos disponibles</h3>
+
+      <div class="component-grid">
+
+        <div class="component-card">
+          <h4>Dell Latitude 5440</h4>
+          <p>Intel Core i7 • 16GB RAM • SSD 512GB</p>
+          <span class="price">$280.000 / mes</span>
+          <button class="card-btn">Solicitar equipo</button>
+        </div>
+
+        <div class="component-card">
+          <h4>HP ProDesk Escritorio</h4>
+          <p>Intel Core i5 • 8GB RAM • SSD 256GB</p>
+          <span class="price">$210.000 / mes</span>
+          <button class="card-btn">Solicitar equipo</button>
+        </div>
+
+        <div class="component-card">
+          <h4>MacBook Pro M2</h4>
+          <p>16GB RAM • SSD 512GB • Retina Display</p>
+          <span class="price">$450.000 / mes</span>
+          <button class="card-btn">Solicitar equipo</button>
+        </div>
+
+        <div class="component-card">
+          <h4>Lenovo ThinkPad E14</h4>
+          <p>Ryzen 7 • 16GB RAM • SSD 1TB</p>
+          <span class="price">$320.000 / mes</span>
+          <button class="card-btn">Solicitar equipo</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PERIFERICOS -->
+    <div class="category">
+      <h3>⌨️ Perifericos</h3>
+
+      <div class="component-grid">
+
+        <div class="component-card">
+          <h4>Teclado mecanico RGB</h4>
+          <p>Switch Red • Iluminacion RGB</p>
+          <span class="price">$25.000 / mes</span>
+          <button class="card-btn">Agregar</button>
+        </div>
+
+        <div class="component-card">
+          <h4>Mouse Logitech G502</h4>
+          <p>11 botones • Sensor HERO</p>
+          <span class="price">$18.000 / mes</span>
+          <button class="card-btn">Agregar</button>
+        </div>
+
+        <div class="component-card">
+          <h4>Monitor Samsung 24"</h4>
+          <p>Full HD • 75Hz</p>
+          <span class="price">$45.000 / mes</span>
+          <button class="card-btn">Agregar</button>
+        </div>
+
+        <div class="component-card">
+          <h4>Diadema HyperX Cloud II</h4>
+          <p>Audio 7.1 • Microfono integrado</p>
+          <span class="price">$22.000 / mes</span>
+          <button class="card-btn">Agregar</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SERVICIOS -->
+    <div class="category">
+      <h3>🛠️ Servicios incluidos</h3>
+
+      <div class="services">
+
+        <div class="service-box">
+          ✅ Soporte tecnico 24/7
+        </div>
+
+        <div class="service-box">
+          ✅ Reposicion inmediata
+        </div>
+
+        <div class="service-box">
+          ✅ Mantenimiento mensual
+        </div>
+
+        <div class="service-box">
+          ✅ Instalacion de software
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+
+if (!usuario) {
+  window.location.href = "login.html";
+}
+
+function logout() {
+  localStorage.removeItem("usuario");
+  window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>
