@@ -1,13 +1,129 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adquisicion de componentes</title>
+<section class="inventory-section">
+
+  <h2>💻 Adquisición y Arrendamiento de Componentes</h2>
+  <p class="subtitle">
+    Equipos tecnológicos y periféricos disponibles para empresas.
+  </p>
+
+  <!-- EQUIPOS -->
+  <div class="category">
+    <h3>🖥️ Equipos Disponibles</h3>
+
+    <div class="card">
+      <h4>Laptop Dell Latitude 5440</h4>
+      <p>Intel Core i7 - 16GB RAM - SSD 512GB</p>
+      <span class="price">$280.000 / mes</span>
+      <button>Solicitar</button>
+    </div>
+
+    <div class="card">
+      <h4>HP ProDesk Escritorio</h4>
+      <p>Intel Core i5 - 8GB RAM - SSD 256GB</p>
+      <span class="price">$210.000 / mes</span>
+      <button>Solicitar</button>
+    </div>
+
+    <div class="card">
+      <h4>MacBook Pro M2</h4>
+      <p>16GB RAM - 512GB SSD - Retina Display</p>
+      <span class="price">$450.000 / mes</span>
+      <button>Solicitar</button>
+    </div>
+
+    <div class="card">
+      <h4>Lenovo ThinkPad E14</h4>
+      <p>Ryzen 7 - 16GB RAM - SSD 1TB</p>
+      <span class="price">$320.000 / mes</span>
+      <button>Solicitar</button>
+    </div>
+  </div>
+
+  <!-- PERIFERICOS -->
+  <div class="category">
+    <h3>⌨️ Periféricos</h3>
+
+    <div class="card">
+      <h4>Teclado Mecánico RGB</h4>
+      <p>Switch Red - Retroiluminación RGB</p>
+      <span class="price">$25.000 / mes</span>
+      <button>Agregar</button>
+    </div>
+
+    <div class="card">
+      <h4>Mouse Logitech G502</h4>
+      <p>11 botones - Sensor HERO</p>
+      <span class="price">$18.000 / mes</span>
+      <button>Agregar</button>
+    </div>
+
+    <div class="card">
+      <h4>Monitor Samsung 24"</h4>
+      <p>Full HD - 75Hz</p>
+      <span class="price">$45.000 / mes</span>
+      <button>Agregar</button>
+    </div>
+
+    <div class="card">
+      <h4>Diadema HyperX Cloud II</h4>
+      <p>Audio 7.1 - Micrófono integrado</p>
+      <span class="price">$22.000 / mes</span>
+      <button>Agregar</button>
+    </div>
+  </div>
+
+  <!-- SERVICIOS -->
+  <div class="category">
+    <h3>🛠️ Servicios Incluidos</h3>
+
+    <div class="service">
+      ✅ Soporte técnico remoto 24/7
+    </div>
+
+    <div class="service">
+      ✅ Reposición inmediata por daño
+    </div>
+
+    <div class="service">
+      ✅ Mantenimiento preventivo mensual
+    </div>
+
+    <div class="service">
+      ✅ Instalación de software corporativo
+    </div>
+  </div>
+
+  <!-- RESUMEN -->
+  <div class="summary">
+    <h3>📊 Estado del Inventario</h3>
+
+    <div class="stats">
+      <div class="stat-box">
+        <span>42</span>
+        <p>Laptops Activas</p>
+      </div>
+
+      <div class="stat-box">
+        <span>18</span>
+        <p>Equipos en Mantenimiento</p>
+      </div>
+
+      <div class="stat-box">
+        <span>76</span>
+        <p>Periféricos Arrendados</p>
+      </div>
+
+      <div class="stat-box">
+        <span>12</span>
+        <p>Empresas Asociadas</p>
+      </div>
+    </div>
+  </div>
+
+</section>
 
 <style>
 
-/* ===== GENERAL ===== */
+/* ===== FONDO GENERAL ===== */
 
 body{
     margin:0;
@@ -16,9 +132,9 @@ body{
     color:#1f2937;
 }
 
+/* ===== CONTENEDOR ===== */
+
 .main-shell{
-    max-width:1300px;
-    margin:auto;
     padding:30px;
 }
 
@@ -29,11 +145,11 @@ body{
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
-    margin-bottom:35px;
+    margin-bottom:30px;
 }
 
 .page-title{
-    font-size:58px;
+    font-size:55px;
     margin:0;
     color:#1f2937;
 }
@@ -44,20 +160,21 @@ body{
     font-size:20px;
 }
 
+/* ===== BOTONES ===== */
+
 .header-actions{
     display:flex;
     gap:15px;
 }
 
 .btn{
-    padding:14px 24px;
+    padding:14px 22px;
     border-radius:18px;
     text-decoration:none;
     font-weight:bold;
     border:none;
     cursor:pointer;
     transition:0.3s;
-    font-size:15px;
 }
 
 .btn-ghost{
@@ -75,7 +192,7 @@ body{
     transform:translateY(-2px);
 }
 
-/* ===== CARDS ===== */
+/* ===== TARJETAS ===== */
 
 .card,
 .component-card,
@@ -84,53 +201,28 @@ body{
     background:white;
     border:1px solid #dfe3ff;
     border-radius:28px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.03);
-}
-
-/* ===== RESUMEN ===== */
-
-.card{
-    padding:30px;
-    margin-bottom:40px;
-}
-
-.stats{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-    margin-top:25px;
-}
-
-.stat-box{
-    padding:30px;
-    text-align:center;
-}
-
-.stat-box span{
-    font-size:45px;
-    font-weight:bold;
-    color:#4f46e5;
-}
-
-.stat-box p{
-    color:#64748b;
-    margin-top:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.03);
 }
 
 /* ===== SECCIONES ===== */
+
+.card{
+    padding:30px;
+    margin-bottom:30px;
+}
 
 .inventory-section{
     margin-top:30px;
 }
 
 .category{
-    margin-bottom:50px;
+    margin-bottom:45px;
 }
 
 .category h3{
     margin-bottom:25px;
-    font-size:30px;
     color:#1e293b;
+    font-size:28px;
 }
 
 /* ===== GRID ===== */
@@ -138,10 +230,10 @@ body{
 .component-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:22px;
+    gap:20px;
 }
 
-/* ===== COMPONENTES ===== */
+/* ===== TARJETAS COMPONENTES ===== */
 
 .component-card{
     padding:25px;
@@ -155,22 +247,26 @@ body{
 
 .component-card h4{
     margin-top:0;
-    font-size:23px;
+    font-size:22px;
     color:#111827;
 }
 
 .component-card p{
     color:#64748b;
-    line-height:1.6;
+    line-height:1.5;
 }
+
+/* ===== PRECIOS ===== */
 
 .price{
     display:block;
     margin-top:18px;
-    font-size:25px;
+    font-size:24px;
     font-weight:bold;
     color:#1d4ed8;
 }
+
+/* ===== BOTONES TARJETAS ===== */
 
 .card-btn{
     width:100%;
@@ -196,13 +292,39 @@ body{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:18px;
+    margin-top:20px;
 }
 
 .service-box{
     padding:22px;
     text-align:center;
-    font-weight:600;
     color:#334155;
+    font-weight:600;
+}
+
+/* ===== ESTADISTICAS ===== */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:20px;
+    margin-top:20px;
+}
+
+.stat-box{
+    padding:30px;
+    text-align:center;
+}
+
+.stat-box span{
+    font-size:42px;
+    font-weight:bold;
+    color:#4f46e5;
+}
+
+.stat-box p{
+    color:#64748b;
+    margin-top:10px;
 }
 
 /* ===== TEXTO ===== */
@@ -210,194 +332,4 @@ body{
 .status-text{
     color:#64748b;
 }
-
 </style>
-
-</head>
-
-<body>
-
-<div class="main-shell">
-
-  <!-- HEADER -->
-  <div class="page-header">
-
-    <div>
-      <h1 class="page-title">💻 Adquisicion de componentes</h1>
-
-      <p class="subtitle">
-        Gestion de arrendamiento, adquisicion y control de componentes tecnologicos.
-      </p>
-    </div>
-
-    <div class="header-actions">
-      <a class="btn btn-ghost" href="index.html">
-        Volver a equipos
-      </a>
-
-      <button class="btn btn-secondary" onclick="logout()">
-        Cerrar sesion
-      </button>
-    </div>
-
-  </div>
-
-  <!-- RESUMEN -->
-  <div class="card">
-
-    <h2>📊 Resumen general</h2>
-
-    <div class="stats">
-
-      <div class="stat-box">
-        <span>42</span>
-        <p>Laptops activas</p>
-      </div>
-
-      <div class="stat-box">
-        <span>18</span>
-        <p>Equipos en mantenimiento</p>
-      </div>
-
-      <div class="stat-box">
-        <span>76</span>
-        <p>Perifericos arrendados</p>
-      </div>
-
-      <div class="stat-box">
-        <span>12</span>
-        <p>Empresas asociadas</p>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- EQUIPOS -->
-  <div class="inventory-section">
-
-    <div class="category">
-
-      <h3>🖥️ Equipos disponibles</h3>
-
-      <div class="component-grid">
-
-        <div class="component-card">
-          <h4>Dell Latitude 5440</h4>
-          <p>Intel Core i7 • 16GB RAM • SSD 512GB</p>
-          <span class="price">$280.000 / mes</span>
-          <button class="card-btn">Solicitar equipo</button>
-        </div>
-
-        <div class="component-card">
-          <h4>HP ProDesk Escritorio</h4>
-          <p>Intel Core i5 • 8GB RAM • SSD 256GB</p>
-          <span class="price">$210.000 / mes</span>
-          <button class="card-btn">Solicitar equipo</button>
-        </div>
-
-        <div class="component-card">
-          <h4>MacBook Pro M2</h4>
-          <p>16GB RAM • SSD 512GB • Retina Display</p>
-          <span class="price">$450.000 / mes</span>
-          <button class="card-btn">Solicitar equipo</button>
-        </div>
-
-        <div class="component-card">
-          <h4>Lenovo ThinkPad E14</h4>
-          <p>Ryzen 7 • 16GB RAM • SSD 1TB</p>
-          <span class="price">$320.000 / mes</span>
-          <button class="card-btn">Solicitar equipo</button>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- PERIFERICOS -->
-    <div class="category">
-
-      <h3>⌨️ Perifericos</h3>
-
-      <div class="component-grid">
-
-        <div class="component-card">
-          <h4>Teclado mecanico RGB</h4>
-          <p>Switch Red • Retroiluminacion RGB</p>
-          <span class="price">$25.000 / mes</span>
-          <button class="card-btn">Agregar</button>
-        </div>
-
-        <div class="component-card">
-          <h4>Mouse Logitech G502</h4>
-          <p>11 botones • Sensor HERO</p>
-          <span class="price">$18.000 / mes</span>
-          <button class="card-btn">Agregar</button>
-        </div>
-
-        <div class="component-card">
-          <h4>Monitor Samsung 24"</h4>
-          <p>Full HD • 75Hz</p>
-          <span class="price">$45.000 / mes</span>
-          <button class="card-btn">Agregar</button>
-        </div>
-
-        <div class="component-card">
-          <h4>Diadema HyperX Cloud II</h4>
-          <p>Audio 7.1 • Microfono integrado</p>
-          <span class="price">$22.000 / mes</span>
-          <button class="card-btn">Agregar</button>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- SERVICIOS -->
-    <div class="category">
-
-      <h3>🛠️ Servicios incluidos</h3>
-
-      <div class="services">
-
-        <div class="service-box">
-          ✅ Soporte tecnico remoto 24/7
-        </div>
-
-        <div class="service-box">
-          ✅ Reposicion inmediata de equipos
-        </div>
-
-        <div class="service-box">
-          ✅ Mantenimiento preventivo mensual
-        </div>
-
-        <div class="service-box">
-          ✅ Instalacion de software corporativo
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<script>
-
-const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
-
-if (!usuario) {
-  window.location.href = "login.html";
-}
-
-function logout() {
-  localStorage.removeItem("usuario");
-  window.location.href = "login.html";
-}
-
-</script>
-
-</body>
-</html>
