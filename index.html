@@ -94,10 +94,10 @@
       <input id="serial" class="input-field" placeholder="Serial">
       <input id="placa" class="input-field" placeholder="Placa">
       <input id="modelo" class="input-field" placeholder="Modelo">
-      <input id="marca" class="input-field" placeholder="ID Marca (ej: 1)">
-      <input id="tipo" class="input-field" placeholder="ID Tipo (ej: 1)">
-      <input id="estado" class="input-field" placeholder="ID Estado (ej: 1)">
-      <input id="piso" class="input-field" placeholder="ID Piso (ej: 1)">
+      <select id="marca" class="select-field"><option value="">Selecciona marca</option></select>
+      <select id="tipo" class="select-field"><option value="">Selecciona tipo</option></select>
+      <select id="estado" class="select-field"><option value="">Selecciona estado</option></select>
+      <select id="piso" class="select-field"><option value="">Selecciona piso</option></select>
       <input id="ciudad" class="input-field" placeholder="Ciudad donde se ubica">
       <input id="edificio" class="input-field" placeholder="Edificio donde se ubica">
       <input id="usuario" class="input-field" placeholder="ID Usuario (ej: 1)">
@@ -223,6 +223,51 @@
     const title = document.querySelector(".card h2");
     if (title) title.insertAdjacentElement("afterend", notice);
   }
+
+
+  function loadCatalogos() {
+    cargarSelectCatalogo("marca", "/marcas", "Selecciona marca");
+    cargarSelectCatalogo("tipo", "/tipos-equipos", "Selecciona tipo");
+    cargarSelectCatalogo("estado", "/estados", "Selecciona estado");
+    cargarSelectCatalogo("piso", "/pisos", "Selecciona piso");
+  }
+
+  function cargarSelectCatalogo(selectId, url, placeholder) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+
+    fetch(url)
+      .then(parseJsonResponse)
+      .then(data => {
+        const valorActual = select.value;
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+
+        if (!Array.isArray(data) || data.length === 0) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "Sin opciones disponibles";
+          option.disabled = true;
+          select.appendChild(option);
+          return;
+        }
+
+        data.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.id;
+          option.textContent = item.nombre || item.nombres || item.descripcion || item.id;
+          select.appendChild(option);
+        });
+
+        if (valorActual) {
+          select.value = valorActual;
+        }
+      })
+      .catch(err => {
+        console.error(`Error al cargar ${selectId}:`, err);
+        select.innerHTML = `<option value="">No se pudo cargar ${selectId}</option>`;
+      });
+  }
+
 
   function logout() {
     localStorage.removeItem("usuario");
