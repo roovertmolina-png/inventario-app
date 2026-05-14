@@ -174,37 +174,6 @@ function buildEquiposExportCsv(rows) {
   return "\uFEFF" + [headers.map(escapeCsvValue).join(";"), ...lines].join("\r\n");
 }
 
-
-function listCatalog(res, tableCandidates, labelColumns) {
-  const tables = Array.isArray(tableCandidates) ? tableCandidates : [tableCandidates];
-
-  function tryTable(index) {
-    const tableName = tables[index];
-    if (!tableName) return res.json([]);
-
-    db.query(`DESCRIBE \`${tableName}\``, (err, columns) => {
-      if (err) {
-        console.log(`No se pudo leer ${tableName}:`, err.message);
-        return tryTable(index + 1);
-      }
-
-      const columnNames = columns.map(column => column.Field);
-      const labelColumn = labelColumns.find(column => columnNames.includes(column)) || columnNames.find(column => column !== "id") || "id";
-      const sql = `SELECT id, \`${labelColumn}\` AS nombre FROM \`${tableName}\` ORDER BY nombre`;
-
-      db.query(sql, (err, result) => {
-        if (err) {
-          console.log(`Error listando ${tableName}:`, err.message);
-          return tryTable(index + 1);
-        }
-        res.json(result);
-      });
-    });
-  }
-
-  tryTable(0);
-}
-
 // RUTA PARA LISTAR EQUIPOS
 app.get("/equipos", (req, res) => {
   const sql = `
@@ -264,24 +233,6 @@ app.get("/historial", (req, res) => {
     }
     res.json(result);
   });
-});
-
-
-// RUTAS PARA LISTAS DESPLEGABLES
-app.get("/marcas", (req, res) => {
-  listCatalog(res, ["marcas", "marca"], ["nombre", "nombres", "descripcion", "marca"]);
-});
-
-app.get("/tipos-equipos", (req, res) => {
-  listCatalog(res, ["tipos_equipos", "tipo_equipos", "tipos_equipo", "tipo_equipo"], ["nombre", "nombres", "descripcion", "tipo"]);
-});
-
-app.get("/estados", (req, res) => {
-  listCatalog(res, ["estados", "estado"], ["nombre", "nombres", "descripcion", "estado"]);
-});
-
-app.get("/pisos", (req, res) => {
-  listCatalog(res, ["pisos", "piso"], ["nombre", "nombres", "descripcion", "piso"]);
 });
 
 // RUTA PARA LISTAR CIUDADES
