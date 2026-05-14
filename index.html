@@ -94,10 +94,10 @@
       <input id="serial" class="input-field" placeholder="Serial">
       <input id="placa" class="input-field" placeholder="Placa">
       <input id="modelo" class="input-field" placeholder="Modelo">
-      <input id="marca" class="input-field" placeholder="ID Marca (ej: 1)">
-      <input id="tipo" class="input-field" placeholder="ID Tipo (ej: 1)">
-      <input id="estado" class="input-field" placeholder="ID Estado (ej: 1)">
-      <input id="piso" class="input-field" placeholder="ID Piso (ej: 1)">
+      <select id="marca" class="select-field"><option value="">Selecciona marca</option></select>
+      <select id="tipo" class="select-field"><option value="">Selecciona tipo</option></select>
+      <select id="estado" class="select-field"><option value="">Selecciona estado</option></select>
+      <select id="piso" class="select-field"><option value="">Selecciona piso</option></select>
       <input id="ciudad" class="input-field" placeholder="Ciudad donde se ubica">
       <input id="edificio" class="input-field" placeholder="Edificio donde se ubica">
       <input id="usuario" class="input-field" placeholder="ID Usuario (ej: 1)">
@@ -182,6 +182,7 @@
 
   const iconEdit = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM5.92 18.42h-.67v-.67l8.76-8.76.67.67-8.76 8.76zM20.71 7.04a1.003 1.003 0 000-1.42l-2.34-2.34a1.003 1.003 0 00-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>`;
   const iconTrash = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zm3.46-9.12l1.06 8h1.96l1.06-8h-4.08zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z"/></svg>`;
+  const catalogos = { marca: {}, tipo: {}, estado: {}, piso: {} };
 
   if (!usuario) {
     window.location.href = "login.html";
@@ -189,7 +190,7 @@
 
   window.addEventListener("load", () => {
     prepararPermisos();
-    loadEquipos();
+    loadCatalogos().then(() => loadEquipos());
     loadHistorial();
 
     const refreshHistorialBtn = document.getElementById("refreshHistorialBtn");
@@ -223,6 +224,67 @@
     const title = document.querySelector(".card h2");
     if (title) title.insertAdjacentElement("afterend", notice);
   }
+
+
+  function loadCatalogos() {
+    return Promise.all([
+      cargarSelectCatalogo("marca", "/marcas", "Selecciona marca", catalogos.marca),
+      cargarSelectCatalogo("tipo", "/tipos-equipos", "Selecciona tipo", catalogos.tipo),
+      cargarSelectCatalogo("estado", "/estados", "Selecciona estado", catalogos.estado),
+      cargarSelectCatalogo("piso", "/pisos", "Selecciona piso", catalogos.piso)
+    ]);
+  }
+
+  function cargarSelectCatalogo(selectId, url, placeholder, catalogo) {
+    const select = document.getElementById(selectId);
+    if (!select) return Promise.resolve();
+
+    return fetch(url)
+      .then(parseJsonResponse)
+      .then(data => {
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        Object.keys(catalogo).forEach(key => delete catalogo[key]);
+
+        if (!Array.isArray(data) || data.length === 0) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "Sin opciones registradas";
+          option.disabled = true;
+          select.appendChild(option);
+          return;
+        }
+
+        data.forEach(item => {
+          catalogo[item.id] = item.nombre;
+          const option = document.createElement("option");
+          option.value = item.id;
+          option.textContent = item.nombre;
+          select.appendChild(option);
+        });
+      })
+      .catch(err => {
+        console.error(`Error al cargar ${selectId}:`, err);
+        select.innerHTML = `<option value="">No se pudo cargar ${selectId}</option>`;
+      });
+  }
+
+  function nombreCatalogo(tipo, id) {
+    if (!id && id !== 0) return "";
+    return catalogos[tipo][id] || id || "";
+  }
+
+  function asegurarOpcionSelect(selectId, value, label) {
+    const select = document.getElementById(selectId);
+    if (!select || !value) return;
+    const exists = Array.from(select.options).some(option => option.value == value);
+    if (!exists) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label || value;
+      select.appendChild(option);
+    }
+  }
+
 
   function logout() {
     localStorage.removeItem("usuario");
@@ -360,10 +422,10 @@
             <td>${equipo.serial || ""}</td>
             <td>${equipo.placa || ""}</td>
             <td>${equipo.modelo || ""}</td>
-            <td>${equipo.marca_id || ""}</td>
-            <td>${equipo.tipo_equipo_id || ""}</td>
-            <td>${equipo.estado_id || ""}</td>
-            <td>${equipo.piso_id || ""}</td>
+            <td>${nombreCatalogo("marca", equipo.marca_id)}</td>
+            <td>${nombreCatalogo("tipo", equipo.tipo_equipo_id)}</td>
+            <td>${nombreCatalogo("estado", equipo.estado_id)}</td>
+            <td>${nombreCatalogo("piso", equipo.piso_id)}</td>
             <td>${equipo.ciudad || ""}</td>
             <td>${equipo.edificio || ""}</td>
             <td>${equipo.usuario_modifica || ""}</td>
@@ -579,6 +641,7 @@
 
 </body>
 </html>
+
 
 
 

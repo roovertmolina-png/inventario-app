@@ -174,6 +174,76 @@ function buildEquiposExportCsv(rows) {
   return "\uFEFF" + [headers.map(escapeCsvValue).join(";"), ...lines].join("\r\n");
 }
 
+
+function listNamedCatalog(res, tableCandidates) {
+  const tables = Array.isArray(tableCandidates) ? tableCandidates : [tableCandidates];
+
+  function tryTable(index) {
+    const tableName = tables[index];
+    if (!tableName) return res.json([]);
+
+    db.query(`DESCRIBE \`${tableName}\``, (err, columns) => {
+      if (err) {
+        console.log(`No se pudo leer catalogo ${tableName}:`, err.message);
+        return tryTable(index + 1);
+      }
+
+      const columnNames = columns.map(column => column.Field);
+      const nameColumn = columnNames.includes("nombre") ? "nombre" : columnNames.find(column => column !== "id");
+      if (!columnNames.includes("id") || !nameColumn) {
+        return tryTable(index + 1);
+      }
+
+      const sql = `SELECT id, \`${nameColumn}\` AS nombre FROM \`${tableName}\` ORDER BY nombre`;
+      db.query(sql, (err, result) => {
+        if (err) {
+          console.log(`Error listando catalogo ${tableName}:`, err.message);
+          return tryTable(index + 1);
+        }
+        res.json(result || []);
+      });
+    });
+  }
+
+  tryTable(0);
+}
+
+function listPisosCatalog(res) {
+  db.query("DESCRIBE `pisos`", (err, columns) => {
+    if (!err) {
+      const columnNames = columns.map(column => column.Field);
+      const nameColumn = columnNames.includes("nombre") ? "nombre" : (columnNames.includes("nombres") ? "nombres" : null);
+
+      if (columnNames.includes("id") && nameColumn) {
+        const sql = `SELECT id, \`${nameColumn}\` AS nombre FROM \`pisos\` ORDER BY nombre`;
+        return db.query(sql, (err, result) => {
+          if (!err) return res.json(result || []);
+          return listPisosDesdeEquipos(res);
+        });
+      }
+    }
+
+    listPisosDesdeEquipos(res);
+  });
+}
+
+function listPisosDesdeEquipos(res) {
+  const sql = `
+    SELECT DISTINCT piso_id AS id, CONCAT('Piso ', piso_id) AS nombre
+    FROM equipos
+    WHERE piso_id IS NOT NULL AND piso_id <> 0
+    ORDER BY piso_id
+  `;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.log("Error listando pisos:", err.message);
+      return res.json([]);
+    }
+    res.json(result || []);
+  });
+}
+
 // RUTA PARA LISTAR EQUIPOS
 app.get("/equipos", (req, res) => {
   const sql = `
@@ -233,6 +303,24 @@ app.get("/historial", (req, res) => {
     }
     res.json(result);
   });
+});
+
+
+// RUTAS PARA LISTAS DESPLEGABLES
+app.get("/marcas", (req, res) => {
+  listNamedCatalog(res, ["marcas", "marca"]);
+});
+
+app.get("/tipos-equipos", (req, res) => {
+  listNamedCatalog(res, ["tipo", "tipos", "tipos_equipos", "tipo_equipos", "tipos_equipo", "tipo_equipo"]);
+});
+
+app.get("/estados", (req, res) => {
+  listNamedCatalog(res, ["estados", "estado"]);
+});
+
+app.get("/pisos", (req, res) => {
+  listPisosCatalog(res);
 });
 
 // RUTA PARA LISTAR CIUDADES
