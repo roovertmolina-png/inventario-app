@@ -175,31 +175,12 @@ function buildEquiposExportCsv(rows) {
 }
 
 
-function listCatalog(res, tableCandidates, labelColumns, fallbackColumn, fallbackLabel) {
+function listCatalog(res, tableCandidates, labelColumns) {
   const tables = Array.isArray(tableCandidates) ? tableCandidates : [tableCandidates];
-
-  function listFromEquiposFallback() {
-    if (!fallbackColumn) return res.json([]);
-
-    const sql = `
-      SELECT DISTINCT ${fallbackColumn} AS id, CONCAT(?, ' ', ${fallbackColumn}) AS nombre
-      FROM equipos
-      WHERE ${fallbackColumn} IS NOT NULL AND ${fallbackColumn} <> 0
-      ORDER BY ${fallbackColumn}
-    `;
-
-    db.query(sql, [fallbackLabel || "ID"], (err, result) => {
-      if (err) {
-        console.log(`Error listando fallback ${fallbackColumn}:`, err.message);
-        return res.json([]);
-      }
-      res.json(result);
-    });
-  }
 
   function tryTable(index) {
     const tableName = tables[index];
-    if (!tableName) return listFromEquiposFallback();
+    if (!tableName) return res.json([]);
 
     db.query(`DESCRIBE \`${tableName}\``, (err, columns) => {
       if (err) {
@@ -215,9 +196,6 @@ function listCatalog(res, tableCandidates, labelColumns, fallbackColumn, fallbac
         if (err) {
           console.log(`Error listando ${tableName}:`, err.message);
           return tryTable(index + 1);
-        }
-        if (!Array.isArray(result) || result.length === 0) {
-          return listFromEquiposFallback();
         }
         res.json(result);
       });
@@ -291,19 +269,19 @@ app.get("/historial", (req, res) => {
 
 // RUTAS PARA LISTAS DESPLEGABLES
 app.get("/marcas", (req, res) => {
-  listCatalog(res, ["marcas", "marca"], ["nombre", "nombres", "descripcion", "marca"], "marca_id", "Marca ID");
+  listCatalog(res, ["marcas", "marca"], ["nombre", "nombres", "descripcion", "marca"]);
 });
 
 app.get("/tipos-equipos", (req, res) => {
-  listCatalog(res, ["tipos_equipos", "tipo_equipos", "tipos_equipo", "tipo_equipo"], ["nombre", "nombres", "descripcion", "tipo"], "tipo_equipo_id", "Tipo ID");
+  listCatalog(res, ["tipos_equipos", "tipo_equipos", "tipos_equipo", "tipo_equipo"], ["nombre", "nombres", "descripcion", "tipo"]);
 });
 
 app.get("/estados", (req, res) => {
-  listCatalog(res, ["estados", "estado"], ["nombre", "nombres", "descripcion", "estado"], "estado_id", "Estado ID");
+  listCatalog(res, ["estados", "estado"], ["nombre", "nombres", "descripcion", "estado"]);
 });
 
 app.get("/pisos", (req, res) => {
-  listCatalog(res, ["pisos", "piso"], ["nombre", "nombres", "descripcion", "piso"], "piso_id", "Piso ID");
+  listCatalog(res, ["pisos", "piso"], ["nombre", "nombres", "descripcion", "piso"]);
 });
 
 // RUTA PARA LISTAR CIUDADES
