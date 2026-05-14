@@ -133,6 +133,47 @@ function ensureEdificio(edificioNombre, callback) {
   });
 }
 
+
+function escapeCsvValue(value) {
+  if (value === null || value === undefined) return "";
+  const text = String(value).replace(/"/g, '""');
+  return `"${text}"`;
+}
+
+function buildEquiposExportCsv(rows) {
+  const headers = [
+    "ID",
+    "Equipo",
+    "Serial",
+    "Placa",
+    "Modelo",
+    "Marca",
+    "Tipo",
+    "Estado",
+    "Piso",
+    "Ciudad",
+    "Edificio",
+    "Usuario modifica"
+  ];
+
+  const lines = rows.map((equipo) => [
+    equipo.id,
+    equipo.nombre_equipo,
+    equipo.serial,
+    equipo.placa,
+    equipo.modelo,
+    equipo.marca_id,
+    equipo.tipo_equipo_id,
+    equipo.estado_id,
+    equipo.piso_id,
+    equipo.ciudad,
+    equipo.edificio,
+    equipo.usuario_modifica
+  ].map(escapeCsvValue).join(";"));
+
+  return "\uFEFF" + [headers.map(escapeCsvValue).join(";"), ...lines].join("\r\n");
+}
+
 // RUTA PARA LISTAR EQUIPOS
 app.get("/equipos", (req, res) => {
   const sql = `
@@ -147,6 +188,32 @@ app.get("/equipos", (req, res) => {
       return res.status(500).json({ success: false, message: "Error servidor" });
     }
     res.json(result);
+  });
+});
+
+
+// RUTA PARA EXPORTAR EQUIPOS A EXCEL
+app.get("/equipos/exportar", (req, res) => {
+  const sql = `
+    SELECT e.*, c.nombres AS ciudad, ed.nombre AS edificio
+    FROM equipos e
+    LEFT JOIN ciudades c ON e.ciudad_id = c.id
+    LEFT JOIN edificios ed ON e.edificio_id = ed.id
+    ORDER BY e.id DESC
+  `;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send("Error al exportar equipos");
+    }
+
+    const fecha = new Date().toISOString().slice(0, 10);
+    const csv = buildEquiposExportCsv(result);
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="inventario-equipos-${fecha}.csv"`);
+    res.send(csv);
   });
 });
 

@@ -118,7 +118,12 @@
   </div>
 
   <div class="card">
-    <h2>Lista de equipos</h2>
+    <div class="section-heading">
+      <div>
+        <h2>Lista de equipos</h2>
+      </div>
+      <button id="exportEquiposBtn" class="btn btn-secondary" type="button">Exportar Excel</button>
+    </div>
     <div class="table-wrap">
       <table class="table-modern" id="equiposTabla">
         <thead>
@@ -190,6 +195,11 @@
     const refreshHistorialBtn = document.getElementById("refreshHistorialBtn");
     if (refreshHistorialBtn) {
       refreshHistorialBtn.addEventListener("click", () => loadHistorial());
+    }
+
+    const exportEquiposBtn = document.getElementById("exportEquiposBtn");
+    if (exportEquiposBtn) {
+      exportEquiposBtn.addEventListener("click", exportarEquipos);
     }
   });
 
@@ -282,6 +292,26 @@
         alert("Error al guardar: " + err.message);
       });
   }
+
+
+
+  function exportarEquipos() {
+    const exportEquiposBtn = document.getElementById("exportEquiposBtn");
+    if (exportEquiposBtn) {
+      exportEquiposBtn.disabled = true;
+      exportEquiposBtn.textContent = "Exportando...";
+    }
+
+    window.location.href = "/equipos/exportar";
+
+    setTimeout(() => {
+      if (exportEquiposBtn) {
+        exportEquiposBtn.disabled = false;
+        exportEquiposBtn.textContent = "Exportar Excel";
+      }
+    }, 1500);
+  }
+
 
   function loadEquipos() {
     fetch("/equipos")
@@ -549,5 +579,6 @@
 
 </body>
 </html>
+
 
 
