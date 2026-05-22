@@ -27,29 +27,52 @@
 
 <script>
 function login() {
+  const mensaje = document.getElementById("mensaje");
+  const correo = document.getElementById("correo").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  mensaje.innerText = "";
+
+  if (!correo || !password) {
+    mensaje.innerText = "Ingresa correo y contrasena";
+    return;
+  }
+
   fetch("/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      correo: document.getElementById("correo").value,
-      password: document.getElementById("password").value
+    body: JSON.stringify({ correo, password })
+  })
+    .then(async res => {
+      const text = await res.text();
+      let data;
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (error) {
+        throw new Error(text || "Respuesta invalida del servidor");
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || "Error del servidor");
+      }
+
+      return data;
     })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      localStorage.setItem("usuario", JSON.stringify(data.usuario));
-      window.location.href = "index.html";
-    } else {
-      document.getElementById("mensaje").innerText = "Datos incorrectos";
-    }
-  })
-  .catch(error => {
-    console.error("Error:", error);
-    document.getElementById("mensaje").innerText = "Error de conexión al servidor";
-  });
+    .then(data => {
+      if (data.success) {
+        localStorage.setItem("usuario", JSON.stringify(data.usuario));
+        window.location.href = "index.html";
+      } else {
+        mensaje.innerText = data.message || "Datos incorrectos";
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      mensaje.innerText = error.message || "Error de conexion al servidor";
+    });
 }
 </script>
 

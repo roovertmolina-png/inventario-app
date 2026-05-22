@@ -594,12 +594,22 @@ app.post("/equipos", (req, res) => {
 app.post("/login", (req, res) => {
   const { correo, password } = req.body;
 
+  if (!correo || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Correo y contrasena son obligatorios"
+    });
+  }
+
   const sql = "SELECT * FROM usuarios WHERE correo = ? AND password = ?";
 
   db.query(sql, [correo, password], (err, result) => {
     if (err) {
-      console.log(err);
-      return res.status(500).send("Error servidor");
+      console.log("Error en login:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Error de conexion con la base de datos. Intenta nuevamente en unos segundos."
+      });
     }
 
     if (result.length > 0) {
