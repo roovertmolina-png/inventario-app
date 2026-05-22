@@ -78,11 +78,6 @@ function registrarHistorial(req, accion, equipoId, equipo, detalles, callback) {
 // CONEXIÃ“N A MARIADB (XAMPP)
 require('dotenv').config();
 
-console.log("PASSWORD:", process.env.DB_PASSWORD);
-initHistorialCambios();
-
-
-
 function ensureCiudad(ciudadNombre, callback) {
   if (!ciudadNombre) {
     return callback(null, null);
