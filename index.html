@@ -242,6 +242,10 @@
     return fetch(url)
       .then(parseJsonResponse)
       .then(data => {
+        if (selectId === "piso" && Array.isArray(data) && !data.some(item => String(item.id) === "2")) {
+          data.push({ id: 2, nombre: "Piso 2" });
+        }
+
         select.innerHTML = `<option value="">${placeholder}</option>`;
         Object.keys(catalogo).forEach(key => delete catalogo[key]);
 
